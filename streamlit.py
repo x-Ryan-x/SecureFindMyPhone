@@ -1,12 +1,10 @@
 import os
 import json
-import time
-import requests
 import streamlit as st
 import main as m
 
 DATA_FILE = "devices.json"
-FCM_URL = "https://fcm.googleapis.com/fcm/send"
+
 
 # Utility: Load or create file
 def load_devices():
@@ -26,14 +24,6 @@ st.title("📱 FCM Device Pinger")
 
 devices = load_devices()
 
-# Remove device
-with st.expander("🗑️ Remove device"):
-    user_to_remove = st.selectbox("Select user", list(devices.keys()) or [""])
-    if st.button("Remove Selected"):
-        if user_to_remove in devices:
-            devices.pop(user_to_remove)
-            save_devices(devices)
-            st.success(f"Removed {user_to_remove}")
 
 # Display list
 st.subheader("📋 Registered Devices")

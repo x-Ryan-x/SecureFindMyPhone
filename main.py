@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 import json, os, requests, time
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
 
 DATA_FILE = "devices.json"
-FCM_URL = "https://fcm.googleapis.com/fcm/send"
+SERVICE_ACCOUNT_FILE =  "service-account.json"
+
+def get_access_token():
+    """Get OAuth2 access token from service account"""
+    try:
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE,
+            scopes=["https://www.googleapis.com/auth/firebase.messaging"]
+        )
+        credentials.refresh(Request())
+        return credentials.token
+    except Exception as e:
+        return None
+    
+def get_project_id():
+    """Extract project ID from service account file"""
+    try:
+        with open(SERVICE_ACCOUNT_FILE) as f:
+            service_account_info = json.load(f)
+            return service_account_info.get("project_id")
+    except Exception:
+        return None
 
 def load_devices():
     try:
@@ -32,24 +55,49 @@ def list_users():
     for user, token in devices.items():
         print(f"{user}: {token[:10]}...")
 
-def ping_user(user, command):
-    devices = load_devices()
-    if user not in devices:
-        print("User not found.")
-        return
-    payload = {
-        "to": devices[user],
-        "priority": "high",
-        "data": {"command": command, "timestamp": int(time.time())}
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    r = requests.post(FCM_URL, headers=headers, json=payload)
-    return {
+def ping_user(token, command):
+    """Send FCM message to a device token using HTTP v1 API"""
+    try:
+        project_id = get_project_id()
+        if not project_id:
+            return {"error": "Failed to get project ID from service account"}
+        
+        access_token = get_access_token()
+        if not access_token:
+            return {"error": "Failed to get OAuth2 access token"}
+        
+        fcm_url = f"https://fcm.googleapis.com/v1/projects/{project_id}/messages:send"
+        
+        payload = {
+            "message": {
+                "token": token,
+                "data": {
+                    "command": command,
+                    "timestamp": str(int(time.time()))
+                },
+                "android": {
+                    "priority": "high"
+                },
+                "apns": {
+                    "headers": {
+                        "apns-priority": "10"
+                    }
+                }
+            }
+        }
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {access_token}"
+        }
+        
+        r = requests.post(fcm_url, headers=headers, json=payload)
+        return {
             "status_code": r.status_code,
             "text": r.text
         }
+    except Exception as e:
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     print("Not intended to be run directly")
