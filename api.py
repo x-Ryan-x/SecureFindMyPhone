@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-import json, os
+import json
+import os
+import sys
 from typing import Optional
 from datetime import datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import main as m
 DATA_FILE = "devices.json"
 
