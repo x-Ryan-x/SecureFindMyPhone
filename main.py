@@ -3,7 +3,6 @@ import json, os, requests, time
 
 DATA_FILE = "devices.json"
 FCM_URL = "https://fcm.googleapis.com/fcm/send"
-#SERVER_KEY = os.environ["FCM_SERVER_KEY"]
 
 def load_devices():
     try:
@@ -44,7 +43,6 @@ def ping_user(user, command):
         "data": {"command": command, "timestamp": int(time.time())}
     }
     headers = {
-    #    "Authorization": f"key={SERVER_KEY}",
         "Content-Type": "application/json"
     }
     r = requests.post(FCM_URL, headers=headers, json=payload)

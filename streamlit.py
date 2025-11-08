@@ -3,10 +3,10 @@ import json
 import time
 import requests
 import streamlit as st
+import main as m
 
 DATA_FILE = "devices.json"
 FCM_URL = "https://fcm.googleapis.com/fcm/send"
-#SERVER_KEY = os.environ.get("FCM_SERVER_KEY")
 
 # Utility: Load or create file
 def load_devices():
@@ -19,26 +19,6 @@ def load_devices():
 def save_devices(devices):
     with open(DATA_FILE, "w") as f:
         json.dump(devices, f, indent=2)
-
-def send_fcm_message(token: str, command: str):
-    """Send a simple FCM data message"""
-    #if not SERVER_KEY:
-     #   return {"error": "FCM_SERVER_KEY not set in environment variables."}
-
-    payload = {
-        "to": token,
-        "priority": "high",
-        "data": {"command": command, "timestamp": int(time.time())},
-    }
-    headers = {
-        #"Authorization": f"key={SERVER_KEY}",
-        "Content-Type": "application/json",
-    }
-    try:
-        resp = requests.post(FCM_URL, headers=headers, json=payload, timeout=10)
-        return {"status_code": resp.status_code, "text": resp.text}
-    except Exception as e:
-        return {"error": str(e)}
 
 # --- Streamlit UI ---
 st.set_page_config(page_title="FCM Device Pinger", page_icon="📱", layout="centered")
@@ -69,7 +49,7 @@ else:
             st.code(token[:40] + "..." if len(token) > 40 else token)
         with col3:
             if st.button("Ping", key=f"ping_{user}"):
-                result = send_fcm_message(token, command="locate")
+                result = m.ping_user(token, command="locate")
                 if "error" in result:
                     st.error(result["error"])
                 else:
