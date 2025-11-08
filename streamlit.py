@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import main as m
 
-DATA_FILE = "devices.json"
+DATA_FILE = "./data/devices.json"
 
 
 # Utility: Load or create file

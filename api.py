@@ -8,7 +8,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import main as m
 
-DATA_FILE = "/data/devices.json"
+DATA_FILE = "./data/devices.json"
 location_directory = "/data/"
 
 app = FastAPI(title="FCM Device Registry", version="1.0")
