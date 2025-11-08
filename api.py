@@ -20,7 +20,7 @@ class DeviceRegistration(BaseModel):
 
 # --- Pydantic model ---
 class LocationReport(BaseModel):
-    user: str
+    token: str
     latitude: float
     longitude: float
     timestamp: Optional[int] = Field(default_factory=lambda: int(datetime.utcnow().timestamp()))
@@ -28,15 +28,11 @@ class LocationReport(BaseModel):
 
 # ---------- Helper functions ----------
 
-def get_location_file(user: str) -> str:
-    """Get the file path for a user's location history"""
-    # Sanitize username for safe filename
-    safe_user = "".join(c for c in user if c.isalnum() or c in ('-', '_'))
-    return os.path.join(LOCATION_DIRECTORY, f"{safe_user}.json")
+def get_location_file(token: str) -> str:    
+    return os.path.join(location_directory, f"{token}.json")
 
-def load_user_locations(user: str) -> list:
-    """Load location history for a user"""
-    filepath = get_location_file(user)
+def load_token_locations(filepath: str) -> list:
+    """Load location history from a file"""
     if not os.path.exists(filepath):
         return []
     
@@ -47,9 +43,9 @@ def load_user_locations(user: str) -> list:
         return []
 
 def append_location(user: str, location_data: dict):
-    """Append a new location to user's history"""
+    """Append a new location to token's history file"""
     filepath = get_location_file(user)
-    locations = load_user_locations(user)
+    locations = load_token_locations(filepath)
     locations.append(location_data)
     
     with open(filepath, "w") as f:
@@ -85,13 +81,14 @@ def report_location(loc: LocationReport):
     }
     """
     location_data = {
+        "token": loc.token,
         "latitude": loc.latitude,
         "longitude": loc.longitude,
         "timestamp": loc.timestamp,
         "received_at": datetime.utcnow().isoformat()
     }
     
-    append_location(loc.user, location_data)
+    append_location(loc.token, location_data)
     
     return {
         "message": f"Location for {loc.user} saved",
