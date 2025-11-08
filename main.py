@@ -21,10 +21,25 @@ def get_access_token():
 def get_project_id():
     """Extract project ID from service account file"""
     try:
+        if not os.path.exists(SERVICE_ACCOUNT_FILE):
+            print(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
+            return None
+        
         with open(SERVICE_ACCOUNT_FILE) as f:
             service_account_info = json.load(f)
-            return service_account_info.get("project_id")
-    except Exception:
+            project_id = service_account_info.get("project_id")
+            
+            if not project_id:
+                print(f"No 'project_id' field in {SERVICE_ACCOUNT_FILE}")
+                print(f"Available keys: {list(service_account_info.keys())}")
+                return None
+                
+            return project_id
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON in service account file: {e}")
+        return None
+    except Exception as e:
+        print(f"Error reading service account: {e}")
         return None
 
 def load_devices():
