@@ -3,7 +3,7 @@ import json, os, requests, time
 import firebase_admin
 from firebase_admin import credentials, messaging
 
-DATA_FILE = "devices.json"
+DATA_FILE = "/data/devices.json"
 SERVICE_ACCOUNT_FILE =  "find-my-phone-74741-55902c5fc985.json"
 
 try:
