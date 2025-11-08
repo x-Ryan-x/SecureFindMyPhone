@@ -46,7 +46,10 @@ def ping_user(user, command):
         "Content-Type": "application/json"
     }
     r = requests.post(FCM_URL, headers=headers, json=payload)
-    print(f"FCM status {r.status_code}: {r.text}")
+    return {
+            "status_code": r.status_code,
+            "text": r.text
+        }
 
 if __name__ == "__main__":
     print("Not intended to be run directly")

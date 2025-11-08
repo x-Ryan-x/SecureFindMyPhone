@@ -50,7 +50,9 @@ else:
         with col3:
             if st.button("Ping", key=f"ping_{user}"):
                 result = m.ping_user(token, command="locate")
-                if "error" in result:
+                if result is None:
+                    st.error("Ping failed - no response from server")
+                elif "error" in result:
                     st.error(result["error"])
                 else:
                     st.info(f"Status {result['status_code']}: {result['text'][:200]}")
