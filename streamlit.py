@@ -6,7 +6,7 @@ import streamlit as st
 
 DATA_FILE = "devices.json"
 FCM_URL = "https://fcm.googleapis.com/fcm/send"
-SERVER_KEY = os.environ.get("FCM_SERVER_KEY")
+#SERVER_KEY = os.environ.get("FCM_SERVER_KEY")
 
 # Utility: Load or create file
 def load_devices():
@@ -22,8 +22,8 @@ def save_devices(devices):
 
 def send_fcm_message(token: str, command: str):
     """Send a simple FCM data message"""
-    if not SERVER_KEY:
-        return {"error": "FCM_SERVER_KEY not set in environment variables."}
+    #if not SERVER_KEY:
+     #   return {"error": "FCM_SERVER_KEY not set in environment variables."}
 
     payload = {
         "to": token,
@@ -31,7 +31,7 @@ def send_fcm_message(token: str, command: str):
         "data": {"command": command, "timestamp": int(time.time())},
     }
     headers = {
-        "Authorization": f"key={SERVER_KEY}",
+        #"Authorization": f"key={SERVER_KEY}",
         "Content-Type": "application/json",
     }
     try:
