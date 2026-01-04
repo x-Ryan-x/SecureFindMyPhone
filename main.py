@@ -4,14 +4,27 @@ import firebase_admin
 from firebase_admin import credentials, messaging
 
 DATA_FILE = "./data/devices.json"
-SERVICE_ACCOUNT_FILE =  "find-my-phone-74741-55902c5fc985.json"
+SERVICE_ACCOUNT_FILE =  "find-my-phone-74741-firebase-adminsdk-fbsvc-eea49e5de2.json"
 
-try:
-    cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
-    firebase_admin.initialize_app(cred)
-except Exception as e:
-    print(f"Failed to initialize Firebase: {e}")
 
+
+def initialize_firebase():
+    try:
+        # Try to get existing app
+        firebase_admin.get_app()
+        print("Firebase already initialized")
+    except ValueError:
+        # App doesn't exist, so initialize it
+        try:
+            cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
+            firebase_admin.initialize_app(cred)
+            print("Firebase initialized successfully")
+        except Exception as e:
+            print(f"Failed to initialize Firebase: {e}")
+            raise
+    except Exception as e:
+        print(f"Unexpected error checking Firebase app: {e}")
+        raise
 
 def load_devices():
     try:
